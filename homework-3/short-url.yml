@@ -1,0 +1,112 @@
+openapi: 3.0.1
+info:
+  title: Short-URL
+  version: 1.0.0
+
+components:
+  schemas:
+    Token:
+      type: object
+      properties:
+        access-key:
+          type: string
+
+    ShortenUrl:
+      type: object
+      properties:
+        value: 
+          type: string
+
+    Statistics:
+      type: object
+      properties:
+        url:
+          type: string
+        total:
+          type: integer
+          format: int64
+        visits:
+          type: array
+          items:
+            type: string
+            format: date-time
+
+  securitySchemes:
+    jwt-auth:
+      type: http
+      scheme: bearer
+
+
+paths:
+  /api/v1/login:
+    post:
+      operationId: LoginUser
+      parameters:
+        - name: username
+          in: query
+          description: "The user name for login"
+          required: true
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: "The password for login in SHA-256"
+          required: true
+          schema:
+            type: string            
+      responses:
+        200:
+          description: "Successful operation"          
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Token"
+        400:
+          description: "Invalid username/password supplied"
+          content: {}
+
+  /api/v1/url:
+    post:
+      summary: "Shorten provided URL"
+      operationId: ShortenUrl
+      parameters:
+        - name: url
+          in: query        
+          description: "URL that needs to be shorten"
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: "Successful operation"
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/ShortenUrl"
+        405:
+          description: "Invalid input"
+   
+
+  /api/v1/url/{urlHash}:
+    get:
+      summary: "Get statistics of visits to the specified URL"
+      operationId: UrlStatistics
+      parameters:
+      - name: urlHash
+        in: path
+        description: "Hash of URL to get the statistics"
+        required: true
+        schema:
+          type: string          
+      responses:
+        200:
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Statistics'
+        400:
+          description: "Invalid Hash supplied"
+          content: {}
+      security:
+      - jwt-auth: []
