@@ -6,11 +6,13 @@ import (
 	"time"
 )
 
+// FileServer is a simple file server that allowed to upload and download files
 type FileServer struct {
 	uploadSrv   *http.Server
 	downloadSrv *http.Server
 }
 
+// NewFileServer makes new FileServer instance
 func NewFileServer() *FileServer {
 	uploadSrv := &http.Server{
 		Addr:         ":80",
@@ -32,11 +34,13 @@ func NewFileServer() *FileServer {
 	}
 }
 
+// Start starts file server
 func (f *FileServer) Start() {
 	go f.downloadSrv.ListenAndServe()
 	go f.uploadSrv.ListenAndServe()
 }
 
+// Shutdown closes file server
 func (f *FileServer) Shutdown(ctx context.Context) {
 	f.uploadSrv.Shutdown(ctx)
 	f.downloadSrv.Shutdown(ctx)
