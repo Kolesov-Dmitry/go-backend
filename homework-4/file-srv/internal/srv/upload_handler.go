@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 )
 
 type uploadHandler struct {
@@ -46,6 +47,7 @@ func (h *uploadHandler) ListRequestHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	ext := r.URL.Query().Get("ext")
 	first := true
 	fmt.Fprint(w, "[")
 	defer fmt.Fprintln(w, "]")
@@ -54,14 +56,21 @@ func (h *uploadHandler) ListRequestHandler(w http.ResponseWriter, r *http.Reques
 		select {
 		case <-r.Context().Done():
 			return
+
 		default:
+			fileName := file.Name()
+			if len(ext) != 0 && !strings.HasSuffix(fileName, ext) {
+				// skip files which have different extention
+				continue
+			}
+
+			// append file name to the output stream
 			if first {
 				first = false
 			} else {
 				fmt.Fprintf(w, ",")
 			}
-			fmt.Fprint(w, file.Name())
-
+			fmt.Fprint(w, fileName)
 			w.(http.Flusher).Flush()
 		}
 	}
