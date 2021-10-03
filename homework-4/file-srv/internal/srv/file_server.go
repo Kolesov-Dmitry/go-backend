@@ -12,17 +12,9 @@ type FileServer struct {
 }
 
 func NewFileServer() *FileServer {
-	mux := http.NewServeMux()
-	handler := uploadHandler{
-		UploadDir: "upload",
-		HostAddr:  "localhost:8080",
-	}
-	mux.HandleFunc("/upload", handler.UploadRequestHandler)
-	mux.HandleFunc("/list", handler.ListRequestHandler)
-
 	uploadSrv := &http.Server{
 		Addr:         ":80",
-		Handler:      mux,
+		Handler:      NewUploadHandler("localhost:8080", "upload"),
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
 	}
