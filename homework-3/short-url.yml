@@ -110,3 +110,22 @@ paths:
           content: {}
       security:
       - jwt-auth: []
+
+  /{urlHash}:
+    get:
+      summary: "Redirect to the saved link by provided shorten URL"
+      operationId: ExpandUrl
+      parameters:
+      - name: urlHash
+        in: path
+        description: "Hash of URL to get the statistics"
+        required: true
+        schema:
+          type: string
+      responses:
+        307:
+          description: "Successful operation"          
+          content: {}
+        404:
+          description: "Not found"
+          content: {}
